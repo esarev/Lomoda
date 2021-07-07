@@ -50,15 +50,100 @@ const cartModalClose = () => {
     enableScroll();
 };
 
+// запрос базы данных
+
+// получение
+const getData = async () => {
+    const data = await fetch('db.json');
+
+    if(data.ok) {
+        return data.json();
+    } else {
+        throw new Error(`Данные небыли получены, ошибка ${data.status} ${data.statusText}`);
+    }
+
+};
+// обработка
+const getGoods = (callback) => {
+    getData().
+        then(data => {
+            console.log(data);
+        })
+        .catch(err => {
+            console.error(err);
+        });
+};
+
+// getGoods((data) => {
+//     console.warn(data)
+// });
+
+
 subheaderCart.addEventListener('click', cartModalOpen);
 
 cartOverlay.addEventListener('click', event => {
     const target = event.target;
 
-    if(target.matches('.cart__btn-close') || target.matches('.cart-overlay') || event.keyCode == 27) {
+    if(target.matches('.cart__btn-close') || target.matches('.cart-overlay') || target === 27) {
         cartModalClose();
     }
 });
+
+
+// работа непосредсвенно с базой данных страницы товаров
+
+try{
+    const goodsList = document.querySelector('.goods__list');
+
+    if(!goodsList) {
+        throw 'This is not a goods page!';
+    }
+
+    const createCard = data => {
+        const li = document.createElement('li');
+
+        li.classList.add('goods__item');
+
+        li.innerHTML = `
+            <article class="good">
+                <a class="good__link-img" href="card-good.html#id56454">
+                    <img class="good__img" src="goods-image/AD002EMLUEA8_14164246_1_v1.jpg" alt="">
+                </a>
+                <div class="good__description">
+                    <p class="good__price">2890 &#8381;</p>
+                    <h3 class="good__title">Eazyway <span class="good__title__grey">/ Тайтсы</span></h3>
+                    <p class="good__sizes">Размеры (RUS): <span class="good__sizes-list">40 42 44 46</span></p>
+                    <a class="good__link" href="card-good.html#id56454">Подробнее</a>
+                </div>
+            </article>
+        `;
+
+        return li;
+    };
+
+    //рендер карточек
+    const renderGoodsList = data => {
+        goodsList.textContent = '';
+        // 1 метод перебора (цикл for:)
+        for (let i = 0; i < data.length; i++) {
+            console.log(data[i]);
+        }
+        // 2 метод перебора (цикл for/of:)
+        for (const item of data) {
+            console.log(item);
+        }
+        // 3 способ (ф-ия forEach:)
+        data.forEach((item) => {
+            console.log(item);
+        });
+    };
+
+    getGoods(renderGoodsList);
+
+}catch (err) {
+    console.warn(err);
+}
+
 
 
 
